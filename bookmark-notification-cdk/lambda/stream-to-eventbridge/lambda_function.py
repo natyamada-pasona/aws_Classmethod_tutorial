@@ -31,9 +31,10 @@ def lambda_handler(event, context):
         response = eventbridge.put_events(
             Entries=[
                 {
-                    'Source': 'custom.bookmarks',
+                    'Source': 'articles.service',
                     'DetailType': 'ArticleShared',
                     'Detail': json.dumps(detail),
+                    'EventBusName': 'bookmarks-bus',
                 }
             ]
         )
