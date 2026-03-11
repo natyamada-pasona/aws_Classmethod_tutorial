@@ -4,6 +4,7 @@ import { HostingConstruct } from './hosting-construct';
 import { AuthConstruct } from './auth-construct';
 import { DynamoDbConstruct } from './dynamodb-construct';
 import { LambdaConstruct } from './lambda-construct';
+import { ApiConstruct } from './api-construct';
 
 /**
  * Wild Rydes アプリケーションのメインスタック
@@ -13,6 +14,7 @@ import { LambdaConstruct } from './lambda-construct';
  *   - Auth     : タスク２ - ユーザー認証（Cognito）
  *   - Database : タスク３ - データストア（DynamoDB）
  *   - Lambda   : タスク３ - バックエンド処理（Lambda）
+ *   - Api      : タスク４ - RESTful API（API Gateway）
  */
 export class WildrydesCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -22,10 +24,16 @@ export class WildrydesCdkStack extends cdk.Stack {
     new HostingConstruct(this, 'Hosting');
 
     // タスク２: ユーザー認証
-    new AuthConstruct(this, 'Auth');
+    const auth = new AuthConstruct(this, 'Auth');
 
     // タスク３: サーバーレスバックエンド
     const database = new DynamoDbConstruct(this, 'Database');
-    new LambdaConstruct(this, 'Lambda', { table: database.table });
+    const lambdaBackend = new LambdaConstruct(this, 'Lambda', { table: database.table });
+
+    // タスク４: RESTful API
+    new ApiConstruct(this, 'Api', {
+      userPool: auth.userPool,
+      requestUnicornFn: lambdaBackend.requestUnicornFn,
+    });
   }
 }
