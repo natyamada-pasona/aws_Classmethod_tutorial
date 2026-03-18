@@ -6,13 +6,13 @@ PROFILE := serverless
 
 # ===== CDK コマンド =====
 diff:
-	cd $(CDK_DIR) && npx cdk diff --profile $(PROFILE)
+	cd $(CDK_DIR) && npx cdk diff --all --profile $(PROFILE)
 
 deploy:
-	cd $(CDK_DIR) && npx cdk deploy --profile $(PROFILE)
+	cd $(CDK_DIR) && npx cdk deploy --all --profile $(PROFILE)
 
 synth:
-	cd $(CDK_DIR) && npx cdk synth
+	cd $(CDK_DIR) && npx cdk synth --all
 
 destroy:
-	cd $(CDK_DIR) && npx cdk destroy --profile $(PROFILE)
+	cd $(CDK_DIR) && npx cdk destroy --all --profile $(PROFILE)
