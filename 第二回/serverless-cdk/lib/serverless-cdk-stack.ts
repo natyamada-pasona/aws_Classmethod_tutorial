@@ -3,6 +3,8 @@ import { Construct } from 'constructs';
 import { DynamoDbConstruct } from './dynamodb-construct';
 import { SnsConstruct } from './sns-construct';
 import { LambdaConstruct } from './lambda-construct';
+import { StepFunctionsConstruct } from './stepfunctions-construct';
+import { EventBridgeConstruct } from './eventbridge-construct';
 
 export class ServerlessCdkStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -20,6 +22,18 @@ export class ServerlessCdkStack extends cdk.Stack {
       ordersTable: database.ordersTable,
       auditLogsTable: database.auditLogsTable,
       notificationTopic: snsNotification.topic,
+    });
+
+    // タスク4: Step Functions（3つの Lambda を並列実行）
+    const stepFunctions = new StepFunctionsConstruct(this, 'StepFunctions', {
+      saveOrderFn: lambdaFunctions.saveOrderFn,
+      sendNotificationFn: lambdaFunctions.sendNotificationFn,
+      saveAuditLogFn: lambdaFunctions.saveAuditLogFn,
+    });
+
+    // タスク5: EventBridge ルール（OrderCreated → Step Functions）
+    new EventBridgeConstruct(this, 'EventBridge', {
+      stateMachine: stepFunctions.stateMachine,
     });
   }
 }

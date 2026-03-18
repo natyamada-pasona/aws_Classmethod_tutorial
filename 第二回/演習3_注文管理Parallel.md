@@ -212,3 +212,69 @@ def lambda_handler(event, context):
   }
 }
 ```
+
+
+---
+
+## タスク５：EventBridge ルール作成
+
+① EventBridge コンソールを開き、「イベントパターンを含む EventBridge ルール」を選択し「ルール作成」をクリックします。
+
+② 以下の設定をします。
+
+| 項目 | 値 |
+|------|-----|
+| 名前 | order-created-rule |
+| イベントバス | default |
+
+③ イベントパターンは「カスタムパターン」を選択し、以下の設定をします。
+
+| 項目 | 値 |
+|------|-----|
+| ルールタイプ | イベントパターン |
+
+④ イベントパターン JSON を以下の通り入力します。
+
+```json
+{
+  "source": ["app.order"],
+  "detail-type": ["OrderCreated"]
+}
+```
+
+⑤ ターゲット：Step Functions ステートマシンに設定します。
+
+⑥ IAM ロール：新規作成を選択します。
+
+---
+
+## タスク６：動作確認
+
+① EventBridge →「イベントバス」→ default を選択します。
+
+② 右上の「イベントを送信」をクリックします。
+
+③ イベントソースと詳細タイプを入力します。
+
+| 項目 | 値 |
+|------|-----|
+| イベントソース | app.order |
+| 詳細タイプ | OrderCreated |
+
+④ イベントの詳細（JSON）を以下の通り入力します。
+
+```json
+{
+  "orderId": "ORDER-001",
+  "userId": "USER-01",
+  "amount": 5000
+}
+```
+
+⑤ 「送信」をクリックします。
+
+⑥ 以下を確認します。
+
+- Step Functions 実行履歴で ParallelTasks → 各 Lambda の成功を確認
+- DynamoDB（Orders / OrderAuditLogs）にデータが追加されていることを確認
+- SNS メール通知が届くことを確認
