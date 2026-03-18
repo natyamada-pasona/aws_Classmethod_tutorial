@@ -10,7 +10,8 @@
       ],
       "autoApprove": [
         "generate_diagram"
-      ]
+      ],
+      "disabledTools": []
     }
   }
 }

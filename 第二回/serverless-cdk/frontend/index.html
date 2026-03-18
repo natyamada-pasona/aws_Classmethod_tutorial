@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>Bookmark 投稿</title>
+</head>
+<body>
+  <h1>Bookmark 投稿</h1>
+  <label>
+    URL：<input type="text" id="content" size="50" />
+  </label>
+  <br /><br />
+  <label>
+    タイトル：<input type="text" id="title" size="50" />
+  </label>
+  <br /><br />
+  <label>
+    共有する：<input type="checkbox" id="shared" />
+  </label>
+  <br /><br />
+  <button onclick="submitBookmark()">投稿</button>
+  <pre id="result"></pre>
+
+  <script>
+    // デプロイ後、CfnOutput の ApiUrl に置き換えてください
+    const API_URL = "https://YOUR_API_ID.execute-api.ap-northeast-1.amazonaws.com";
+
+    async function submitBookmark() {
+      const content = document.getElementById("content").value;
+      const title = document.getElementById("title").value;
+      const shared = document.getElementById("shared").checked;
+
+      const res = await fetch(API_URL + "/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, title, shared })
+      });
+
+      const text = await res.text();
+      document.getElementById("result").innerText = `status: ${res.status}\n${text}`;
+    }
+  </script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import * as cdk from 'aws-cdk-lib/core';
 import { ServerlessCdkStack } from '../lib/serverless-cdk-stack';
+import { BookmarkCdkStack } from '../lib/bookmark-stack';
 
 const app = new cdk.App();
 new ServerlessCdkStack(app, 'ServerlessCdkStack', {
@@ -18,3 +19,5 @@ new ServerlessCdkStack(app, 'ServerlessCdkStack', {
 
   /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
 });
+
+new BookmarkCdkStack(app, 'BookmarkCdkStack', {});
