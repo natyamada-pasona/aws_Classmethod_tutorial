@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Knowledge Share App</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    label { display: block; margin-top: 15px; }
+    button { margin-top: 20px; padding: 10px 20px; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <h1>ナレッジ投稿</h1>
+  <form id="articleForm">
+    <label>
+      タイトル：
+      <input type="text" id="title" required>
+    </label>
+    <label>
+      内容：
+      <textarea id="content" rows="5" required></textarea>
+    </label>
+    <label>
+      <input type="checkbox" id="shared">
+      ナレッジを共有する（Shared）
+    </label>
+    <button type="submit">Submit</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    // デプロイ後、cdk deploy の出力 ApiEndpoint の値に置き換えてください
+    const API_ENDPOINT = "https://fjgeqvxbab.execute-api.ap-northeast-1.amazonaws.com";
+
+    const form = document.getElementById("articleForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const payload = {
+        title: document.getElementById("title").value,
+        content: document.getElementById("content").value,
+        shared: document.getElementById("shared").checked
+      };
+
+      try {
+        const response = await fetch(`${API_ENDPOINT}/articles`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+
+        await response.json();
+        resultDiv.textContent = "Article created successfully!";
+      } catch (error) {
+        console.error("fetch error:", error);
+        resultDiv.textContent = "エラーが発生しました。コンソールを確認してください。";
+      }
+    });
+  </script>
+</body>
+</html>

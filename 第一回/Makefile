@@ -1,4 +1,5 @@
 # デフォルトターゲット: 間違って make しても安全なように diff だけ表示
+# wildrydesは削除したので現在使用できない
 .DEFAULT_GOAL := diff
 
 CDK_DIR := wildrydes-cdk
@@ -29,3 +30,7 @@ synth2:
 
 destroy2:
 	cd $(CDK_DIR2) && npx cdk destroy --profile wildrydes
+
+# ===== フロントエンド（ローカル確認用） =====
+serve:
+	cd $(CDK_DIR2)/frontend && python3 -m http.server 3005
