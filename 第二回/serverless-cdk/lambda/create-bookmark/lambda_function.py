@@ -1,7 +1,11 @@
 import json
+import logging
 import os
 import boto3
 from botocore.exceptions import ClientError
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("BookmarksTable")
@@ -12,10 +16,13 @@ EVENT_BUS_NAME = os.environ.get("EVENT_BUS_NAME", "bookmarks-bus")
 
 
 def lambda_handler(event, context):
+    logger.info("イベント受信: %s", json.dumps(event, default=str))
+
     body = json.loads(event["body"])
     content = body["content"]
     title = body.get("title", "")
     shared = body.get("shared", False)
+    logger.info("content=%s, title=%s, shared=%s", content, title, shared)
 
     try:
         table.put_item(
@@ -26,8 +33,10 @@ def lambda_handler(event, context):
             },
             ConditionExpression="attribute_not_exists(content)"
         )
+        logger.info("DynamoDB に保存完了")
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
+            logger.warning("ブックマーク重複: %s", content)
             return {
                 "statusCode": 409,
                 "body": json.dumps({"message": "Duplicate bookmark"})
@@ -50,8 +59,9 @@ def lambda_handler(event, context):
                 }
             ]
         )
-        print("Event sent to EventBridge")
-        print("EventBridge response:", response)
+        logger.info("EventBridge にイベント送信: %s", json.dumps(response, default=str))
+    else:
+        logger.info("shared=False のため EventBridge 送信スキップ")
 
     return {
         "statusCode": 200,
